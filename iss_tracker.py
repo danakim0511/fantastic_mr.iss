@@ -77,13 +77,25 @@ def parse_metadata_from_xml(xml_url):
         # Parse the XML content
         dom = xml.dom.minidom.parseString(xml_content)
 
-        # Get all METADATA elements
-        metadatas = dom.getElementsByTagName('METADATA')
+        # Get all metadata elements
+        metadata_elements = dom.getElementsByTagName('metadata')
 
-        # Extract text from METADATA elements
-        metadata_texts = [metadata.firstChild.nodeValue.strip() for metadata in metadatas if metadata.firstChild]
+        # Extract text from metadata elements
+        metadata_texts = []
 
-        # Return the extracted comment texts
+        # Iterate through each metadata element
+        for metadata_element in metadata_elements:
+            metadata = {}
+            # Iterate through child elements of metadata
+            for child in metadata_element.childNodes:
+                # Check if the child is an element node
+                if child.nodeType == child.ELEMENT_NODE:
+                    # Add key-value pair to metadata dictionary
+                    metadata[child.tagName] = child.firstChild.nodeValue.strip()
+            # Append metadata dictionary to the list
+            metadata_texts.append(metadata)
+
+        # Return the extracted metadata
         return {'metadata': metadata_texts}
     except Exception as e:
         # Handle any exceptions
