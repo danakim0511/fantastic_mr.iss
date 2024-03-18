@@ -21,6 +21,19 @@ logging.basicConfig(filename='iss_tracker.log', level=logging.ERROR)
 # Define the mean Earth radius constant
 MEAN_EARTH_RADIUS = 6371.0  # in kilometers
 
+# Define a function to parse the comment lines and store them in a dictionary
+def parse_comment_from_xml(xml_url):
+    try:
+        response = requests.get(xml_url)
+        if response.status_code == 200:
+            data_dict = xmltodict.parse(response.content)
+            comment_data = data_dict.get("comment")
+            return comment_data
+        else:
+            return {"error": f"Failed to fetch XML data. Status code: {response.status_code}"}
+    except Exception as e:
+        return {"error": f"An error occurred: {e}"}
+
 def parse_iss_data(xml_data: dict) -> List[Dict[str, Any]]:
     """Parse the ISS data and store it in a list of dictionaries format.
 
@@ -151,11 +164,11 @@ def calculate_location_for_epoch(epoch_data: Dict[str, Union[str, float]]) -> Di
 
 # ROUTES!!!
 
-# Route to return the 'comment' list object from the ISS data
+# Route to return the comment object parsed from the XML file
 @app.route('/comment', methods=['GET'])
 def get_comment():
-    # Placeholder for comment data
-    comment_data = {"comment": "This is a placeholder comment."}
+    xml_url = 'https://nasa-public-data.s3.amazonaws.com/iss-coords/current/ISS_OEM/ISS.OEM_J2K_EPH.xml'
+    comment_data = parse_comment_from_xml(xml_url)
     return jsonify(comment_data)
 
 # Route to return the 'header' dictionary object from the ISS data
