@@ -26,37 +26,37 @@ This Flask application fetches and displays International Space Station (ISS) da
 1. Clone the repository:
 
 ```bash
-   git clone <repository-url>
-   cd iss-tracker-flask
+git clone <repository-url>
+cd iss-tracker-flask
 ```
 
 #### Install dependencies:
-    ```bash
-    pip install -r requirements.txt
+```bash
+pip install -r requirements.txt
 ```
 
 ## Running the Application
 ### Local Development
 1. Run the Flask application locally:
 ```bash
-   python iss_tracker.py
+python iss_tracker.py
 ```
 2. Access the application at http://127.0.0.1:5000.
 
 ### Using Docker
 1. Build the Docker image:
 ```bash
-   docker build -t iss-tracker-flask .
+docker build -t iss-tracker-flask .
 ```
 2. Run the Docker container:
 ```bash
-   docker run -p 5000:5000 iss-tracker-flask
+docker run -p 5000:5000 iss-tracker-flask
 ```
 3. Access the application at http://127.0.0.1:5000.
 ## Testing
 To run the tests, execute the following command:
 ```bash
-    pytest
+pytest
 ```
 ## API Endpoints
 /comment: Fetches and returns the comments from ISS data.
