@@ -256,14 +256,18 @@ def get_header():
     return jsonify(header_data)
 
 # Route to return the 'metadata' dictionary object from the ISS data
-@app.route('/metadata', methods=['GET'])
+@app.route('/metadata')
 def get_metadata():
-    xml_url = 'https://nasa-public-data.s3.amazonaws.com/iss-coords/current/ISS_OEM/ISS.OEM_J2K_EPH.xml'
-    metadata_data = parse_comment_from_xml(xml_url)
+    # Replace this line with your logic to fetch and parse metadata
+    metadata = parse_metadata_from_xml("your_xml_url_here")
     
-    if isinstance(metadata_data, dict) and 'error' in metadata_data:
-        # Handle error response
-        return jsonify(metadata_data), 500
+    # Check if metadata was fetched successfully
+    if 'metadata' in metadata:
+        # Return metadata as a JSON response
+        return metadata
+    else:
+        # Return an error response
+        return {'error': 'Failed to fetch metadata'}, 500
 
 # Route to return the entire data set
 @app.route('/epochs', methods=['GET'])
