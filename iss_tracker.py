@@ -33,8 +33,7 @@ def parse_comment_from_xml(xml_url):
         comments = root.findall('.//COMMENT')
 
         # Extract the text from each COMMENT element
-        comment_texts = [comment.text.strip() for comment in comments]
-
+        comment_texts = [comment.text.strip() if comment.text is not None else "" for comment in comments]
         # Return the extracted comment texts
         return {'comments': comment_texts}
     except Exception as e:
