@@ -280,7 +280,7 @@ def get_header():
         dict: Dictionary containing the 'header' data.
     """
     xml_url = 'https://nasa-public-data.s3.amazonaws.com/iss-coords/current/ISS_OEM/ISS.OEM_J2K_EPH.xml'
-    header_data = parse_comment_from_xml(xml_url)
+    header_data = parse_header_from_xml(xml_url)
     
     if isinstance(header_data, dict) and 'error' in header_data:
         # Handle error response
