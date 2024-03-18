@@ -14,7 +14,7 @@ def test_header_route():
     # Test the /header route
     response = requests.get(f'{BASE_URL}/header')
     assert response.status_code == 200
-    assert 'comments' in response.json()
+    assert 'header' in response.json()
 
 def test_metadata_route():
     # Test the /metadata route
