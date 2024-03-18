@@ -175,13 +175,14 @@ def get_comment():
         # Handle error response
         return jsonify(comment_data), 500
 
-    # Extract relevant data from comment_data if needed
-    # For example, if comment_data is a Response object
-    # you might need to extract its JSON data
-    json_data = comment_data.json()
-
-    # jsonify the extracted data
-    return jsonify(json_data)
+    # Check if comment_data is a Response object
+    if hasattr(comment_data, 'json'):
+        # Extract relevant data from comment_data and jsonify it
+        json_data = comment_data.json()
+        return jsonify(json_data)
+    else:
+        # Handle case where comment_data is not a Response object
+        return jsonify({'error': 'Unexpected data format returned from XML parsing'}), 500
 
 # Route to return the 'header' dictionary object from the ISS data
 @app.route('/header', methods=['GET'])
