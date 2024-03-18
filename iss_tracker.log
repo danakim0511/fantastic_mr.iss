@@ -3,12 +3,5 @@ INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a
 INFO:werkzeug:[33mPress CTRL+C to quit[0m
 INFO:werkzeug: * Restarting with stat
 WARNING:werkzeug: * Debugger is active!
-INFO:werkzeug: * Debugger PIN: 115-203-106
-ERROR:root:Error: name 'request' is not defined
-INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 06:50:28] "[35m[1mGET /epochs HTTP/1.1[0m" 500 -
-ERROR:root:Error: name 'request' is not defined
-INFO:werkzeug:127.0.0.1 - - [26/Feb/2024 06:54:09] "[35m[1mGET /epochs HTTP/1.1[0m" 500 -
-INFO:werkzeug: * Detected change in '/home/ubuntu/my-coe332-hws/homework05/iss_tracker.py', reloading
-INFO:werkzeug: * Restarting with stat
-WARNING:werkzeug: * Debugger is active!
-INFO:werkzeug: * Debugger PIN: 115-203-106
+INFO:werkzeug: * Debugger PIN: 116-019-726
+INFO:werkzeug:127.0.0.1 - - [18/Mar/2024 20:34:08] "GET /epochs?limit=int HTTP/1.1" 200 -
