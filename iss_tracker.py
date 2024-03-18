@@ -21,20 +21,19 @@ logging.basicConfig(filename='iss_tracker.log', level=logging.ERROR)
 # Define the mean Earth radius constant
 MEAN_EARTH_RADIUS = 6371.0  # in kilometers
 
-# Define a function to parse the comment lines and store them in a dictionary
 def parse_comment_from_xml(xml_url):
     try:
-        # Parse the XML from the URL
+        # Fetch XML content from the URL
         response = requests.get(xml_url)
-        print("XML Content:", response.content.decode())  # Debug output
-        tree = ET.ElementTree(ET.fromstring(response.content))
-        root = tree.getroot()
+        response.raise_for_status()  # Raise an error for bad responses
+        xml_content = response.content.decode()
 
-        # Find all COMMENT elements
-        comments = root.findall('.//COMMENT')
+        # Parse the XML content
+        root = ET.fromstring(xml_content)
 
-        # Extract the text from each COMMENT element
-        comment_texts = [comment.text.strip() if comment.text is not None else "" for comment in comments]
+        # Find all COMMENT elements and extract their text
+        comment_texts = [comment.text.strip() for comment in root.iter('COMMENT')]
+
         # Return the extracted comment texts
         return {'comments': comment_texts}
     except Exception as e:
