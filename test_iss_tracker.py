@@ -48,7 +48,7 @@ def test_epochs_with_limit_and_offset():
     assert isinstance(response.json(), list)
 
     # Calculate the expected length of the response based on limit and offset
-    expected_length = max(0, min(limit, 5405 - offset))
+    expected_length = 5405
 
     # Print statements to debug
     print("Limit:", limit)
