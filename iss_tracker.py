@@ -24,16 +24,22 @@ MEAN_EARTH_RADIUS = 6371.0  # in kilometers
 # Define a function to parse the comment lines and store them in a dictionary
 def parse_comment_from_xml(xml_url):
     try:
+        # Parse the XML from the URL
         response = requests.get(xml_url)
-        if response.status_code == 200:
-            data_dict = xmltodict.parse(response.content)
-            comment_data = data_dict.get("comment")
-            return jsonify({"comment": comment_data})
-        else:
-            return jsonify({"error": f"Failed to fetch XML data. Status code: {response.status_code}"}), 500
-    except Exception as e:
-        return jsonify({"error": f"An error occurred: {e}"}), 500
+        tree = ET.ElementTree(ET.fromstring(response.content))
+        root = tree.getroot()
 
+        # Find all COMMENT elements
+        comments = root.findall('.//COMMENT')
+
+        # Extract the text from each COMMENT element
+        comment_texts = [comment.text.strip() for comment in comments]
+
+        # Return the extracted comment texts
+        return {'comments': comment_texts}
+    except Exception as e:
+        # Handle any exceptions
+        return {'error': str(e)}
 
 def parse_iss_data(xml_data: dict) -> List[Dict[str, Any]]:
     """Parse the ISS data and store it in a list of dictionaries format.
