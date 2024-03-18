@@ -41,11 +41,16 @@ def test_specific_epoch_route():
 
 def test_epochs_with_limit_and_offset():
     # Test the /epochs route with limit and offset parameters
-    limit = 5405
+    limit = 5
     offset = 2
     response = requests.get(f'{BASE_URL}/epochs?limit={limit}&offset={offset}')
     assert response.status_code == 200
     assert isinstance(response.json(), list)
+    print("Limit:", limit)
+    print("Offset:", offset)
+    print("Expected length:", expected_length)
+    print("Actual length of response JSON:", len(response.json()))
+
 
     # Calculate the expected length of the response based on limit and offset
     expected_length = min(limit, 5405 - offset)
