@@ -14,7 +14,7 @@ def test_header_route():
     # Test the /header route
     response = requests.get(f'{BASE_URL}/header')
     assert response.status_code == 200
-    assert 'header' in response.json()
+    assert 'comments' in response.json()
 
 def test_metadata_route():
     # Test the /metadata route
@@ -41,10 +41,13 @@ def test_specific_epoch_route():
 
 def test_epochs_with_limit_and_offset():
     # Test the /epochs route with limit and offset parameters
-    response = requests.get(f'{BASE_URL}/epochs?limit=5&offset=2')
+    limit = 5
+    offset = 2
+    response = requests.get(f'{BASE_URL}/epochs?limit={limit}&offset={offset}')
     assert response.status_code == 200
     assert isinstance(response.json(), list)
-    assert len(response.json()) == 5
+    # Ensure that the length of the response matches the expected length based on limit and offset
+    assert len(response.json()) == min(limit, 5405 - offset)
 
 def test_epoch_speed_route():
     # Test the /epochs/<epoch>/speed route with a representative epoch
@@ -80,6 +83,4 @@ def test_now_route():
     assert 'altitude' in response.json()
     assert 'geoposition' in response.json()
     assert 'speed' in response.json()
-
-# Note: Before running these tests, make sure your Flask application is running locally.
 
