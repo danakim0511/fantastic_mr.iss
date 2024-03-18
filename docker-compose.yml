@@ -1,6 +1,8 @@
-version: '3'
+version: "3"
+
 services:
   iss-tracker:
-    build: .
+    build:
+      context: ./
     ports:
       - "5000:5000"
