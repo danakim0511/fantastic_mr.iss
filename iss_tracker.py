@@ -259,7 +259,7 @@ def get_header():
 @app.route('/metadata')
 def get_metadata():
     # Replace this line with your logic to fetch and parse metadata
-    metadata = parse_metadata_from_xml("your_xml_url_here")
+    metadata = parse_metadata_from_xml('https://nasa-public-data.s3.amazonaws.com/iss-coords/current/ISS_OEM/ISS.OEM_J2K_EPH.xml')
     
     # Check if metadata was fetched successfully
     if 'metadata' in metadata:
