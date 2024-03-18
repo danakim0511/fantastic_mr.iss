@@ -284,7 +284,7 @@ def get_header():
     Returns:
         dict: Dictionary containing the 'header' data.
     """
-    header = parse_metadata_from_xml('https://nasa-public-data.s3.amazonaws.com/iss-coords/current/ISS_OEM/ISS.OEM_J2K_EPH.xml')
+    header = parse_header_from_xml('https://nasa-public-data.s3.amazonaws.com/iss-coords/current/ISS_OEM/ISS.OEM_J2K_EPH.xml')
     
     # Check if metadata was fetched successfully
     if 'header' in header:
