@@ -55,14 +55,36 @@ def parse_header_from_xml(xml_url):
         # Parse the XML content
         dom = xml.dom.minidom.parseString(xml_content)
 
-        # Get all COMMENT elements
+        # Get all HEADER elements
         headers = dom.getElementsByTagName('HEADER')
 
-        # Extract text from COMMENT elements
+        # Extract text from HEADER elements
         header_texts = [header.firstChild.nodeValue.strip() for header in headers if header.firstChild]
 
         # Return the extracted comment texts
         return {'header': header_texts}
+    except Exception as e:
+        # Handle any exceptions
+        return {'error': str(e)}
+    
+def parse_metadata_from_xml(xml_url):
+    try:
+        # Fetch XML content from the URL
+        response = requests.get(xml_url)
+        response.raise_for_status()  # Raise an error for bad responses
+        xml_content = response.content.decode()
+
+        # Parse the XML content
+        dom = xml.dom.minidom.parseString(xml_content)
+
+        # Get all METADATA elements
+        metadatas = dom.getElementsByTagName('METADATA')
+
+        # Extract text from METADATA elements
+        metadata_texts = [metadata.firstChild.nodeValue.strip() for metadata in metadatas if metadata.firstChild]
+
+        # Return the extracted comment texts
+        return {'metadata': metadata_texts}
     except Exception as e:
         # Handle any exceptions
         return {'error': str(e)}
@@ -224,9 +246,12 @@ def get_header():
 # Route to return the 'metadata' dictionary object from the ISS data
 @app.route('/metadata', methods=['GET'])
 def get_metadata():
-    # Placeholder for metadata
-    metadata = {"metadata": {"key": "value"}}
-    return jsonify(metadata)
+    xml_url = 'https://nasa-public-data.s3.amazonaws.com/iss-coords/current/ISS_OEM/ISS.OEM_J2K_EPH.xml'
+    metadata_data = parse_comment_from_xml(xml_url)
+    
+    if isinstance(metadata_data, dict) and 'error' in metadata_data:
+        # Handle error response
+        return jsonify(metadata_data), 500
 
 # Route to return the entire data set
 @app.route('/epochs', methods=['GET'])
