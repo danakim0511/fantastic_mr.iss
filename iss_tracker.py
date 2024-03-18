@@ -24,6 +24,14 @@ logging.basicConfig(filename='iss_tracker.log', level=logging.ERROR)
 MEAN_EARTH_RADIUS = 6371.0  # in kilometers
 
 def parse_comment_from_xml(xml_url):
+    """Parse comments from XML data.
+
+    Args:
+        xml_url (str): URL of the XML data.
+
+    Returns:
+        Dict[str, Union[str, List[str]]]: Parsed comments or error message.
+    """
     try:
         # Fetch XML content from the URL
         response = requests.get(xml_url)
@@ -46,6 +54,14 @@ def parse_comment_from_xml(xml_url):
         return {'error': str(e)}
     
 def parse_header_from_xml(xml_url):
+    """Parse header from XML data.
+
+    Args:
+        xml_url (str): URL of the XML data.
+
+    Returns:
+        Dict[str, Union[str, List[str]]]: Parsed header or error message.
+    """
     try:
         # Fetch XML content from the URL
         response = requests.get(xml_url)
@@ -68,6 +84,14 @@ def parse_header_from_xml(xml_url):
         return {'error': str(e)}
     
 def parse_metadata_from_xml(xml_url):
+    """Parse metadata from XML data.
+
+    Args:
+        xml_url (str): URL of the XML data.
+
+    Returns:
+        Dict[str, Union[str, List[str]]]: Parsed metadata or error message.
+    """
     try:
         # Fetch XML content from the URL
         response = requests.get(xml_url)
@@ -229,11 +253,14 @@ def calculate_location_for_epoch(epoch_data: Dict[str, Union[str, float]]) -> Di
         "geoposition": location.address if location else "Unknown"
     }
 
-# ROUTES!!!
-
 # Route to return the comment object parsed from the XML file
 @app.route('/comment', methods=['GET'])
 def get_comment():
+    """_summary_
+
+    Returns:
+        _type_: _description_
+    """
     xml_url = 'https://nasa-public-data.s3.amazonaws.com/iss-coords/current/ISS_OEM/ISS.OEM_J2K_EPH.xml'
     comment_data = parse_comment_from_xml(xml_url)
     
@@ -246,6 +273,12 @@ def get_comment():
 # Route to return the 'header' dictionary object from the ISS data
 @app.route('/header', methods=['GET'])
 def get_header():
+    """
+    Fetches and returns the 'header' dictionary object from the ISS data.
+
+    Returns:
+        dict: Dictionary containing the 'header' data.
+    """
     xml_url = 'https://nasa-public-data.s3.amazonaws.com/iss-coords/current/ISS_OEM/ISS.OEM_J2K_EPH.xml'
     header_data = parse_comment_from_xml(xml_url)
     
@@ -258,7 +291,12 @@ def get_header():
 # Route to return the 'metadata' dictionary object from the ISS data
 @app.route('/metadata')
 def get_metadata():
-    # Replace this line with your logic to fetch and parse metadata
+    """
+    Fetches and returns the 'metadata' dictionary object from the ISS data.
+
+    Returns:
+        dict: Dictionary containing the 'metadata' data.
+    """
     metadata = parse_metadata_from_xml('https://nasa-public-data.s3.amazonaws.com/iss-coords/current/ISS_OEM/ISS.OEM_J2K_EPH.xml')
     
     # Check if metadata was fetched successfully
@@ -272,6 +310,12 @@ def get_metadata():
 # Route to return the entire data set
 @app.route('/epochs', methods=['GET'])
 def get_epochs():
+    """
+    Fetches and returns the entire data set of ISS state vectors.
+
+    Returns:
+        dict: Dictionary containing the entire data set.
+    """
     try:
         # Make a GET request to the ISS data URL
         response = requests.get(url='https://nasa-public-data.s3.amazonaws.com/iss-coords/current/ISS_OEM/ISS.OEM_J2K_EPH.xml')
@@ -297,6 +341,12 @@ def get_epochs():
         return jsonify({"error": "Internal server error"}), 500
     
 def get_entire_data_set():
+    """
+    Helper function to fetch and return the entire data set of ISS state vectors.
+
+    Returns:
+        dict: Dictionary containing the entire data set.
+    """
     try:
         response = requests.get(url='https://nasa-public-data.s3.amazonaws.com/iss-coords/current/ISS_OEM/ISS.OEM_J2K_EPH.xml')
         if response.status_code == 200:
@@ -312,6 +362,12 @@ def get_entire_data_set():
 
 @app.route('/epochs', methods=['GET'])
 def get_modified_epochs_list():
+    """
+    Fetches and returns a modified subset of the ISS state vector data based on query parameters.
+
+    Returns:
+        dict: Dictionary containing the modified data set based on limit and offset parameters.
+    """
     try:
         # Get limit and offset from query parameters
         limit = int(request.args.get('limit', default=10))  # default limit is 10   
@@ -338,6 +394,15 @@ def get_modified_epochs_list():
 # Route to get state vectors for a specific Epoch from the data set
 @app.route('/epochs/<epoch>', methods=['GET'])
 def get_state_vectors_for_epoch(epoch: str):
+    """
+    Fetches and returns the state vectors for a specific epoch from the ISS data set.
+
+    Args:
+        epoch (str): The epoch for which state vectors are requested.
+
+    Returns:
+        dict: Dictionary containing the state vectors for the specified epoch.
+    """
     try:
         response = requests.get(url='https://nasa-public-data.s3.amazonaws.com/iss-coords/current/ISS_OEM/ISS.OEM_J2K_EPH.xml')
         if response.status_code == 200:
@@ -361,6 +426,15 @@ def get_state_vectors_for_epoch(epoch: str):
 # Route to get instantaneous speed for a specific Epoch in the data set
 @app.route('/epochs/<epoch>/speed', methods=['GET'])
 def get_instantaneous_speed_for_epoch(epoch: str):
+    """
+    Fetches and returns the instantaneous speed for a specific epoch from the ISS data set.
+
+    Args:
+        epoch (str): The epoch for which instantaneous speed is requested.
+
+    Returns:
+        dict: Dictionary containing the instantaneous speed for the specified epoch.
+    """
     try:
         response = requests.get(url='https://nasa-public-data.s3.amazonaws.com/iss-coords/current/ISS_OEM/ISS.OEM_J2K_EPH.xml')
         if response.status_code == 200:
@@ -386,6 +460,15 @@ def get_instantaneous_speed_for_epoch(epoch: str):
 # Route to get latitude, longitude, altitude, and geoposition for a specific epoch in the data set
 @app.route('/epochs/<epoch>/location', methods=['GET'])
 def get_location_for_epoch(epoch: str):
+    """
+    Fetches and returns the location data for a specific epoch from the ISS data set.
+
+    Args:
+        epoch (str): The epoch for which location data is requested.
+
+    Returns:
+        dict: Dictionary containing the location data for the specified epoch.
+    """
     try:
         response = requests.get(url='https://nasa-public-data.s3.amazonaws.com/iss-coords/current/ISS_OEM/ISS.OEM_J2K_EPH.xml')
         if response.status_code == 200:
@@ -411,6 +494,12 @@ def get_location_for_epoch(epoch: str):
 # Route to get latitude, longitude, altitude, geoposition, and speed for the epoch that is nearest in time
 @app.route('/now', methods=['GET'])
 def get_data_for_nearest_epoch():
+    """
+    Fetches and returns data for the epoch nearest to the current time from the ISS data set.
+
+    Returns:
+        dict: Dictionary containing data for the epoch nearest to the current time.
+    """
     try:
         response = requests.get(url='https://nasa-public-data.s3.amazonaws.com/iss-coords/current/ISS_OEM/ISS.OEM_J2K_EPH.xml')
         if response.status_code == 200:
