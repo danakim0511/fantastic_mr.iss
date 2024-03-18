@@ -28,11 +28,12 @@ def parse_comment_from_xml(xml_url):
         if response.status_code == 200:
             data_dict = xmltodict.parse(response.content)
             comment_data = data_dict.get("comment")
-            return comment_data
+            return jsonify({"comment": comment_data})
         else:
-            return {"error": f"Failed to fetch XML data. Status code: {response.status_code}"}
+            return jsonify({"error": f"Failed to fetch XML data. Status code: {response.status_code}"}), 500
     except Exception as e:
-        return {"error": f"An error occurred: {e}"}
+        return jsonify({"error": f"An error occurred: {e}"}), 500
+
 
 def parse_iss_data(xml_data: dict) -> List[Dict[str, Any]]:
     """Parse the ISS data and store it in a list of dictionaries format.
@@ -169,7 +170,7 @@ def calculate_location_for_epoch(epoch_data: Dict[str, Union[str, float]]) -> Di
 def get_comment():
     xml_url = 'https://nasa-public-data.s3.amazonaws.com/iss-coords/current/ISS_OEM/ISS.OEM_J2K_EPH.xml'
     comment_data = parse_comment_from_xml(xml_url)
-    print(comment_data)
+    return jsonify(comment_data)
 
 # Route to return the 'header' dictionary object from the ISS data
 @app.route('/header', methods=['GET'])
