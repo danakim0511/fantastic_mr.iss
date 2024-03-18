@@ -169,7 +169,7 @@ def calculate_location_for_epoch(epoch_data: Dict[str, Union[str, float]]) -> Di
 def get_comment():
     xml_url = 'https://nasa-public-data.s3.amazonaws.com/iss-coords/current/ISS_OEM/ISS.OEM_J2K_EPH.xml'
     comment_data = parse_comment_from_xml(xml_url)
-    return jsonify(comment_data)
+    print(comment_data)
 
 # Route to return the 'header' dictionary object from the ISS data
 @app.route('/header', methods=['GET'])
