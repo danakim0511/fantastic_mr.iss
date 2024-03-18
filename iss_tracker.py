@@ -381,6 +381,10 @@ def get_data_for_nearest_epoch():
 
             # Calculate and include instantaneous speed closest to 'now'
             closest_data_point["instantaneous_speed"] = calculate_instantaneous_speed(closest_data_point)
+            
+            # Calculate and include latitude, longitude, altitude, and geoposition for the closest epoch
+            location_data = calculate_location_for_epoch(closest_data_point)
+            closest_data_point.update(location_data)
 
             return jsonify(closest_data_point)
         else:
