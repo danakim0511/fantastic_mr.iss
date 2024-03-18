@@ -71,13 +71,25 @@ def parse_header_from_xml(xml_url):
         # Parse the XML content
         dom = xml.dom.minidom.parseString(xml_content)
 
-        # Get all HEADER elements
-        headers = dom.getElementsByTagName('header')
+        # Get all metadata elements
+        header_elements = dom.getElementsByTagName('header')
 
-        # Extract text from HEADER elements
-        header_texts = [header.firstChild.nodeValue.strip() for header in headers if header.firstChild]
+        # Extract text from metadata elements
+        header_texts = []
 
-        # Return the extracted comment texts
+        # Iterate through each metadata element
+        for header_element in header_elements:
+            header = {}
+            # Iterate through child elements of metadata
+            for child in header_element.childNodes:
+                # Check if the child is an element node
+                if child.nodeType == child.ELEMENT_NODE:
+                    # Add key-value pair to metadata dictionary
+                    header[child.tagName] = child.firstChild.nodeValue.strip()
+            # Append metadata dictionary to the list
+            header_texts.append(header)
+
+        # Return the extracted metadata
         return {'header': header_texts}
     except Exception as e:
         # Handle any exceptions
@@ -280,14 +292,15 @@ def get_header():
     Returns:
         dict: Dictionary containing the 'header' data.
     """
-    xml_url = 'https://nasa-public-data.s3.amazonaws.com/iss-coords/current/ISS_OEM/ISS.OEM_J2K_EPH.xml'
-    header_data = parse_header_from_xml(xml_url)
+    header = parse_metadata_from_xml('https://nasa-public-data.s3.amazonaws.com/iss-coords/current/ISS_OEM/ISS.OEM_J2K_EPH.xml')
     
-    if isinstance(header_data, dict) and 'error' in header_data:
-        # Handle error response
-        return jsonify(header_data), 500
-
-    return jsonify(header_data)
+    # Check if metadata was fetched successfully
+    if 'header' in header:
+        # Return metadata as a JSON response
+        return header
+    else:
+        # Return an error response
+        return {'error': 'Failed to fetch header'}, 500
 
 # Route to return the 'metadata' dictionary object from the ISS data
 @app.route('/metadata')
