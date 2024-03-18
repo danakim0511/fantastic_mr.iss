@@ -390,12 +390,8 @@ def get_modified_epochs_list():
             return jsonify(modified_data)
         else:
             return jsonify({"error": f"Failed to fetch ISS data. Status code: {response.status_code}"}), 500
-
-    except ValueError as ve:
-        return jsonify({"error": f"Invalid value for limit or offset: {ve}"}), 400
     except Exception as e:
-        logging.error(f"Error: {e}")
-        return jsonify({"error": f"An error occurred: {e}"}), 500
+        return jsonify({"error": str(e)}), 500
 
 # Route to get state vectors for a specific Epoch from the data set
 @app.route('/epochs/<epoch>', methods=['GET'])
