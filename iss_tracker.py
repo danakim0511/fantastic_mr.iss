@@ -367,7 +367,7 @@ def get_location_for_epoch(epoch: str):
         logging.error(f"Error: {e}")
         return jsonify({"error": f"An error occurred: {e}"}), 500
 
-# Route to get state vectors and instantaneous speed for the Epoch that is nearest in time
+# Route to get latitude, longitude, altitude, geoposition, and speed for the epoch that is nearest in time
 @app.route('/now', methods=['GET'])
 def get_data_for_nearest_epoch():
     try:
@@ -379,14 +379,22 @@ def get_data_for_nearest_epoch():
             # Find the closest data point to 'now'
             closest_data_point = find_closest_data_point(iss_data)
 
-            # Calculate and include instantaneous speed closest to 'now'
-            closest_data_point["instantaneous_speed"] = calculate_instantaneous_speed(closest_data_point)
-            
-            # Calculate and include latitude, longitude, altitude, and geoposition for the closest epoch
-            location_data = calculate_location_for_epoch(closest_data_point)
-            closest_data_point.update(location_data)
+            # Calculate instantaneous speed closest to 'now'
+            instantaneous_speed = calculate_instantaneous_speed(closest_data_point)
 
-            return jsonify(closest_data_point)
+            # Calculate latitude, longitude, altitude, and geoposition for the closest epoch
+            location_data = calculate_location_for_epoch(closest_data_point)
+
+            # Create a JSON object containing the required information
+            result = {
+                "latitude": location_data["latitude"],
+                "longitude": location_data["longitude"],
+                "altitude": location_data["altitude"],
+                "geoposition": location_data["geoposition"],
+                "speed": instantaneous_speed
+            }
+
+            return jsonify(result)
         else:
             return jsonify({"error": f"Failed to fetch ISS data. Status code: {response.status_code}"}), 500
 
