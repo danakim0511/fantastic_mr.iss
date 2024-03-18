@@ -72,7 +72,7 @@ def parse_header_from_xml(xml_url):
         dom = xml.dom.minidom.parseString(xml_content)
 
         # Get all HEADER elements
-        headers = dom.getElementsByTagName('HEADER')
+        headers = dom.getElementsByTagName('header')
 
         # Extract text from HEADER elements
         header_texts = [header.firstChild.nodeValue.strip() for header in headers if header.firstChild]
@@ -256,10 +256,11 @@ def calculate_location_for_epoch(epoch_data: Dict[str, Union[str, float]]) -> Di
 # Route to return the comment object parsed from the XML file
 @app.route('/comment', methods=['GET'])
 def get_comment():
-    """_summary_
+    """
+    Fetches and returns the 'comment' dictionary object from the ISS data.
 
     Returns:
-        _type_: _description_
+        dict: Dictionary containing the 'comment' data.
     """
     xml_url = 'https://nasa-public-data.s3.amazonaws.com/iss-coords/current/ISS_OEM/ISS.OEM_J2K_EPH.xml'
     comment_data = parse_comment_from_xml(xml_url)
