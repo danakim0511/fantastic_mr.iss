@@ -26,6 +26,7 @@ def parse_comment_from_xml(xml_url):
     try:
         # Parse the XML from the URL
         response = requests.get(xml_url)
+        print("XML Content:", response.content.decode())  # Debug output
         tree = ET.ElementTree(ET.fromstring(response.content))
         root = tree.getroot()
 
