@@ -66,31 +66,23 @@ def parse_header_from_xml(xml_url):
         # Fetch XML content from the URL
         response = requests.get(xml_url)
         response.raise_for_status()  # Raise an error for bad responses
-        xml_content = response.content.decode()
+        xml_content = response.content
 
-        # Parse the XML content
-        dom = xml.dom.minidom.parseString(xml_content)
+        # Parse the XML content using ElementTree
+        root = ET.fromstring(xml_content)
 
-        # Get all metadata elements
-        header_elements = dom.getElementsByTagName('header')
+        # Find the header element
+        header_element = root.find('.//header')
 
-        # Extract text from metadata elements
-        header_texts = []
+        if header_element is None:
+            raise ValueError("Header element not found in the XML")
 
-        # Iterate through each metadata element
-        for header_element in header_elements:
-            header = {}
-            # Iterate through child elements of metadata
-            for child in header_element.childNodes:
-                # Check if the child is an element node
-                if child.nodeType == child.ELEMENT_NODE:
-                    # Add key-value pair to metadata dictionary
-                    header[child.tagName] = child.firstChild.nodeValue.strip()
-            # Append metadata dictionary to the list
-            header_texts.append(header)
+        # Extract header data
+        header_data = {}
+        for child in header_element:
+            header_data[child.tag] = child.text.strip()
 
-        # Return the extracted metadata
-        return {'header': header_texts}
+        return {'header': header_data}
     except Exception as e:
         # Handle any exceptions
         return {'error': str(e)}
