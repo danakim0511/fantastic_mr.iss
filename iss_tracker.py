@@ -32,7 +32,7 @@ def parse_comment_from_xml(xml_url):
         root = ET.fromstring(xml_content)
 
         # Find all COMMENT elements and extract their text
-        comment_texts = [comment.text.strip() for comment in root.iter('COMMENT')]
+        comment_texts = [comment.text.strip() for comment in root.iter('COMMENT') if comment.text is not None]
 
         # Return the extracted comment texts
         return {'comments': comment_texts}
