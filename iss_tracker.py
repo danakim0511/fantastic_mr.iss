@@ -44,6 +44,28 @@ def parse_comment_from_xml(xml_url):
     except Exception as e:
         # Handle any exceptions
         return {'error': str(e)}
+    
+def parse_header_from_xml(xml_url):
+    try:
+        # Fetch XML content from the URL
+        response = requests.get(xml_url)
+        response.raise_for_status()  # Raise an error for bad responses
+        xml_content = response.content.decode()
+
+        # Parse the XML content
+        dom = xml.dom.minidom.parseString(xml_content)
+
+        # Get all COMMENT elements
+        headers = dom.getElementsByTagName('HEADER')
+
+        # Extract text from COMMENT elements
+        header_texts = [header.firstChild.nodeValue.strip() for header in headers if header.firstChild]
+
+        # Return the extracted comment texts
+        return {'header': header_texts}
+    except Exception as e:
+        # Handle any exceptions
+        return {'error': str(e)}
 
 def parse_iss_data(xml_data: dict) -> List[Dict[str, Any]]:
     """Parse the ISS data and store it in a list of dictionaries format.
@@ -190,8 +212,13 @@ def get_comment():
 # Route to return the 'header' dictionary object from the ISS data
 @app.route('/header', methods=['GET'])
 def get_header():
-    # Placeholder for header data
-    header_data = {"header": {"key": "value"}}
+    xml_url = 'https://nasa-public-data.s3.amazonaws.com/iss-coords/current/ISS_OEM/ISS.OEM_J2K_EPH.xml'
+    header_data = parse_comment_from_xml(xml_url)
+    
+    if isinstance(header_data, dict) and 'error' in header_data:
+        # Handle error response
+        return jsonify(header_data), 500
+
     return jsonify(header_data)
 
 # Route to return the 'metadata' dictionary object from the ISS data
