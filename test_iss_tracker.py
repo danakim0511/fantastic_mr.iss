@@ -41,7 +41,7 @@ def test_specific_epoch_route():
 
 def test_epochs_with_limit_and_offset():
     # Test the /epochs route with limit and offset parameters
-    limit = 5
+    limit = 5405
     offset = 2
     response = requests.get(f'{BASE_URL}/epochs?limit={limit}&offset={offset}')
     assert response.status_code == 200
