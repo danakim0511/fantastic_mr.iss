@@ -1,17 +1,25 @@
 import requests
+
 from typing import List, Dict, Any
 from dateutil import parser
 from datetime import datetime, timezone
+
 import xml.etree.ElementTree as ET
 import xmltodict
 import logging
+import math
+
 from flask import Flask, jsonify, request
 from typing import Union
+from geopy.geocoders import Nominatim
 
 app = Flask(__name__)
 
 # Configure logging
 logging.basicConfig(filename='iss_tracker.log', level=logging.ERROR)
+
+# Define the mean Earth radius constant
+MEAN_EARTH_RADIUS = 6371.0  # in kilometers
 
 def parse_iss_data(xml_data: dict) -> List[Dict[str, Any]]:
     """Parse the ISS data and store it in a list of dictionaries format.
@@ -100,6 +108,70 @@ def print_data_range(iss_data: List[Dict[str, str]]):
         end_epoch = iss_data[-1]["EPOCH"]
         print(f"Data range from {start_epoch} to {end_epoch}")
         
+def calculate_location_for_epoch(epoch_data: Dict[str, Union[str, float]]) -> Dict[str, Union[str, float]]:
+    """Calculate latitude, longitude, altitude, and geoposition for a given epoch data.
+
+    Args:
+        epoch_data (Dict[str, Union[str, float]]): Dictionary containing ISS data for a specific epoch.
+
+    Returns:
+        Dict[str, Union[str, float]]: Dictionary containing latitude, longitude, altitude, and geoposition.
+    """
+    x = epoch_data.get("X", 0)
+    y = epoch_data.get("Y", 0)
+    z = epoch_data.get("Z", 0)
+
+    # Calculate latitude
+    lat = math.degrees(math.atan2(z, math.sqrt(x**2 + y**2)))
+
+    # Calculate altitude
+    alt = math.sqrt(x**2 + y**2 + z**2) - MEAN_EARTH_RADIUS
+
+    # Calculate longitude
+    lon = math.degrees(math.atan2(y, x)) - ((datetime.utcnow().hour - 12) + (datetime.utcnow().minute / 60)) * (360 / 24) + 19
+
+    # Check and adjust longitude if it falls outside the range [-180, 180]
+    if lon > 180:
+        lon = -180 + (lon - 180)
+    elif lon < -180:
+        lon = 180 + (lon + 180)
+
+    # Initialize geocoder
+    geolocator = Nominatim(user_agent="iss_tracker")
+
+    # Determine geoposition from latitude and longitude
+    location = geolocator.reverse(f"{lat}, {lon}")
+
+    return {
+        "latitude": lat,
+        "longitude": lon,
+        "altitude": alt,
+        "geoposition": location.address if location else "Unknown"
+    }
+
+# ROUTES!!!
+
+# Route to return the 'comment' list object from the ISS data
+@app.route('/comment', methods=['GET'])
+def get_comment():
+    # Placeholder for comment data
+    comment_data = {"comment": "This is a placeholder comment."}
+    return jsonify(comment_data)
+
+# Route to return the 'header' dictionary object from the ISS data
+@app.route('/header', methods=['GET'])
+def get_header():
+    # Placeholder for header data
+    header_data = {"header": {"key": "value"}}
+    return jsonify(header_data)
+
+# Route to return the 'metadata' dictionary object from the ISS data
+@app.route('/metadata', methods=['GET'])
+def get_metadata():
+    # Placeholder for metadata
+    metadata = {"metadata": {"key": "value"}}
+    return jsonify(metadata)
+
 # Route to return the entire data set
 @app.route('/epochs', methods=['GET'])
 def get_epochs():
@@ -214,6 +286,31 @@ def get_instantaneous_speed_for_epoch(epoch: str):
         logging.error(f"Error: {e}")
         return jsonify({"error": f"An error occurred: {e}"}), 500
 
+# Route to get latitude, longitude, altitude, and geoposition for a specific epoch in the data set
+@app.route('/epochs/<epoch>/location', methods=['GET'])
+def get_location_for_epoch(epoch: str):
+    try:
+        response = requests.get(url='https://nasa-public-data.s3.amazonaws.com/iss-coords/current/ISS_OEM/ISS.OEM_J2K_EPH.xml')
+        if response.status_code == 200:
+            data_dict = xmltodict.parse(response.content)
+            iss_data = parse_iss_data(data_dict)
+
+            # Find data for the specified epoch
+            epoch_data = next((data_point for data_point in iss_data if data_point["EPOCH"] == epoch), None)
+            
+            if epoch_data:
+                # Calculate location for the epoch
+                location_data = calculate_location_for_epoch(epoch_data)
+                return jsonify(location_data)
+            else:
+                return jsonify({"error": f"No data found for the specified epoch: {epoch}"}), 404
+        else:
+            return jsonify({"error": f"Failed to fetch ISS data. Status code: {response.status_code}"}), 500
+
+    except Exception as e:
+        logging.error(f"Error: {e}")
+        return jsonify({"error": f"An error occurred: {e}"}), 500
+
 # Route to get state vectors and instantaneous speed for the Epoch that is nearest in time
 @app.route('/now', methods=['GET'])
 def get_data_for_nearest_epoch():
@@ -236,6 +333,6 @@ def get_data_for_nearest_epoch():
     except Exception as e:
         logging.error(f"Error: {e}")
         return jsonify({"error": f"An error occurred: {e}"}), 500
-
+    
 if __name__ == '__main__':
     app.run(debug=True)
