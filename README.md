@@ -59,15 +59,15 @@ To run the tests, execute the following command:
 pytest
 ```
 ## API Endpoints
-/comment: Fetches and returns the comments from ISS data.
-/header: Fetches and returns the header information from ISS data.
-/metadata: Fetches and returns the metadata from ISS data.
-/epochs: Fetches and returns the entire data set of ISS state vectors.
-/epochs/<epoch>: Fetches and returns the state vectors for a specific epoch.
-/epocs?limit=int&offset=int: Fetches and returns modified list of Epochs given query parameters
-/epochs/<epoch>/speed: Fetches and returns the instantaneous speed for a specific epoch.
-/epochs/<epoch>/location: Fetches and returns the location data for a specific epoch.
-/now: Fetches and returns data for the epoch nearest to the current time.
+- /comment: Fetches and returns the comments from ISS data.
+- /header: Fetches and returns the header information from ISS data.
+- /metadata: Fetches and returns the metadata from ISS data.
+- /epochs: Fetches and returns the entire data set of ISS state vectors.
+- /epochs/<epoch>: Fetches and returns the state vectors for a specific epoch.
+- /epocs?limit=int&offset=int: Fetches and returns modified list of Epochs given query parameters
+- /epochs/<epoch>/speed: Fetches and returns the instantaneous speed for a specific epoch.
+- /epochs/<epoch>/location: Fetches and returns the location data for a specific epoch.
+- /now: Fetches and returns data for the epoch nearest to the current time.
 
 ## Credits
 This application was developed by Dana Kim.
