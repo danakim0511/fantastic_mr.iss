@@ -366,7 +366,7 @@ def get_entire_data_set():
         logging.error(f"Error: {e}")
         return jsonify({"error": f"An error occurred: {e}"}), 500
 
-@app.route('/epochs', methods=['GET'])
+@app.route('/epochs?limit=int&offset=int', methods=['GET'])
 def get_modified_epochs_list():
     """
     Fetches and returns a modified subset of the ISS state vector data based on query parameters.
