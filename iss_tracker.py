@@ -12,6 +12,8 @@ import math
 from flask import Flask, jsonify, request
 from typing import Union
 from geopy.geocoders import Nominatim
+import requests
+import xml.dom.minidom
 
 app = Flask(__name__)
 
@@ -29,14 +31,13 @@ def parse_comment_from_xml(xml_url):
         xml_content = response.content.decode()
 
         # Parse the XML content
-        root = ET.fromstring(xml_content)
+        dom = xml.dom.minidom.parseString(xml_content)
 
-        # Print the root tag and the first few characters of the XML content to check if it's parsed correctly
-        print("Root tag:", root.tag)
-        print("First few characters of XML content:", xml_content[:100])
+        # Get all COMMENT elements
+        comments = dom.getElementsByTagName('COMMENT')
 
-        # Find all COMMENT elements and extract their text
-        comment_texts = [comment.text.strip() for comment in root.iter('COMMENT') if comment.text is not None]
+        # Extract text from COMMENT elements
+        comment_texts = [comment.firstChild.nodeValue.strip() for comment in comments if comment.firstChild]
 
         # Return the extracted comment texts
         return {'comments': comment_texts}
