@@ -46,17 +46,15 @@ def test_epochs_with_limit_and_offset():
     response = requests.get(f'{BASE_URL}/epochs?limit={limit}&offset={offset}')
     assert response.status_code == 200
     assert isinstance(response.json(), list)
-    print("Limit:", limit)
-    print("Offset:", offset)
-    print("Expected length:", expected_length)
-    print("Actual length of response JSON:", len(response.json()))
-
 
     # Calculate the expected length of the response based on limit and offset
     expected_length = min(limit, 5405 - offset)
 
-    print("Length of response JSON:", len(response.json()))
+    # Print statements to debug
+    print("Limit:", limit)
+    print("Offset:", offset)
     print("Expected length:", expected_length)
+    print("Actual length of response JSON:", len(response.json()))
 
     # Ensure that the length of the response matches the expected length
     assert len(response.json()) == expected_length
