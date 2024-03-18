@@ -1,78 +1,85 @@
-import unittest
-from unittest.mock import patch
-from io import StringIO
-from datetime import datetime, timezone
-from iss_tracker import (
-    parse_iss_data,
-    calculate_average_speed,
-    find_closest_data_point,
-    print_data_range,
-)
+import pytest
+import requests
 
+# Define the base URL of the Flask application
+BASE_URL = 'http://127.0.0.1:5000'
 
-class TestISSTracker(unittest.TestCase):
-    def setUp(self):
-        # Sample XML data for testing
-        self.sample_xml_data = {
-            "ndm": {
-                "oem": {
-                    "body": {
-                        "segment": {
-                            "data": {
-                                "stateVector": [
-                                    {"EPOCH": "2024-01-01T00:00:00.000Z", "X": {"#text": "1.0"}, "Y": {"#text": "2.0"}, "Z": {"#text": "3.0"}},
-                                    {"EPOCH": "2024-01-02T00:00:00.000Z", "X": {"#text": "4.0"}, "Y": {"#text": "5.0"}, "Z": {"#text": "6.0"}},
-                                ]
-                            }
-                        }
-                    }
-                }
-            }
-        }
+def test_comment_route():
+    # Test the /comment route
+    response = requests.get(f'{BASE_URL}/comment')
+    assert response.status_code == 200
+    assert 'comments' in response.json()
 
-    def test_parse_iss_data(self):
-        iss_data = parse_iss_data(self.sample_xml_data)
-        self.assertEqual(len(iss_data), 2)
-        self.assertEqual(iss_data[0]["EPOCH"], "2024-01-01T00:00:00.000Z")
-        self.assertEqual(iss_data[1]["Y"], 5.0)
+def test_header_route():
+    # Test the /header route
+    response = requests.get(f'{BASE_URL}/header')
+    assert response.status_code == 200
+    assert 'header' in response.json()
 
-    def test_calculate_average_speed(self):
-        iss_data = [
-            {"X_DOT": 1.0, "Y_DOT": 2.0, "Z_DOT": 3.0},
-            {"X_DOT": 4.0, "Y_DOT": 5.0, "Z_DOT": 6.0},
-        ]
-        avg_speed = calculate_average_speed(iss_data)
-        expected_avg_speed = 4.115599
-        margin_of_error = 5.0
-        self.assertLess(abs(avg_speed - expected_avg_speed), margin_of_error)
+def test_metadata_route():
+    # Test the /metadata route
+    response = requests.get(f'{BASE_URL}/metadata')
+    assert response.status_code == 200
+    assert 'metadata' in response.json()
 
-    def test_find_closest_data_point(self):
-        now = datetime.utcnow().replace(tzinfo=timezone.utc)
-        iss_data = [
-            {"EPOCH": "2024-01-01T00:00:00.000Z"},
-            {"EPOCH": "2024-01-02T00:00:00.000Z"},
-        ]
-        # Print the original iss_data for debugging
-        print("Original iss_data:", iss_data)
-    
-        closest_data_point = find_closest_data_point(iss_data)
-    
-        # Print the sorted iss_data for debugging
-        print("Sorted iss_data:", iss_data)
-    
-        self.assertEqual(closest_data_point["EPOCH"], "2024-01-02T00:00:00.000Z")
+def test_epochs_route():
+    # Test the /epochs route
+    response = requests.get(f'{BASE_URL}/epochs')
+    assert response.status_code == 200
+    assert isinstance(response.json(), list)
 
-    def test_print_data_range(self):
-        with patch("sys.stdout", new_callable=StringIO) as mock_stdout:
-            iss_data = [
-                {"EPOCH": "2024-01-01T00:00:00.000Z"},
-                {"EPOCH": "2024-01-02T00:00:00.000Z"},
-            ]
-            print_data_range(iss_data)
-            output = mock_stdout.getvalue().strip()
-            self.assertEqual(output, "Data range from 2024-01-01T00:00:00.000Z to 2024-01-02T00:00:00.000Z")
+def test_specific_epoch_route():
+    # Test the /epochs/<epoch> route with a representative epoch
+    response1 = requests.get(f'{BASE_URL}/epochs')
+    assert response1.status_code == 200
+    assert isinstance(response1.json(), list)
+    assert len(response1.json()) > 0
+    a_representative_epoch = response1.json()[0]['EPOCH']
+    response2 = requests.get(f'{BASE_URL}/epochs/{a_representative_epoch}')
+    assert response2.status_code == 200
+    assert isinstance(response2.json(), list)
 
+def test_epochs_with_limit_and_offset():
+    # Test the /epochs route with limit and offset parameters
+    response = requests.get(f'{BASE_URL}/epochs?limit=5&offset=2')
+    assert response.status_code == 200
+    assert isinstance(response.json(), list)
+    assert len(response.json()) == 5
 
-if __name__ == '__main__':
-    unittest.main()
+def test_epoch_speed_route():
+    # Test the /epochs/<epoch>/speed route with a representative epoch
+    response1 = requests.get(f'{BASE_URL}/epochs')
+    assert response1.status_code == 200
+    assert isinstance(response1.json(), list)
+    assert len(response1.json()) > 0
+    a_representative_epoch = response1.json()[0]['EPOCH']
+    response2 = requests.get(f'{BASE_URL}/epochs/{a_representative_epoch}/speed')
+    assert response2.status_code == 200
+    assert 'instantaneous_speed' in response2.json()
+
+def test_epoch_location_route():
+    # Test the /epochs/<epoch>/location route with a representative epoch
+    response1 = requests.get(f'{BASE_URL}/epochs')
+    assert response1.status_code == 200
+    assert isinstance(response1.json(), list)
+    assert len(response1.json()) > 0
+    a_representative_epoch = response1.json()[0]['EPOCH']
+    response2 = requests.get(f'{BASE_URL}/epochs/{a_representative_epoch}/location')
+    assert response2.status_code == 200
+    assert 'latitude' in response2.json()
+    assert 'longitude' in response2.json()
+    assert 'altitude' in response2.json()
+    assert 'geoposition' in response2.json()
+
+def test_now_route():
+    # Test the /now route
+    response = requests.get(f'{BASE_URL}/now')
+    assert response.status_code == 200
+    assert 'latitude' in response.json()
+    assert 'longitude' in response.json()
+    assert 'altitude' in response.json()
+    assert 'geoposition' in response.json()
+    assert 'speed' in response.json()
+
+# Note: Before running these tests, make sure your Flask application is running locally.
 
