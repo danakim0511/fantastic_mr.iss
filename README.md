@@ -1,52 +1,73 @@
-# Homework 05 The Darjeeling Flask
+# ISS Tracker Flask Application
 
-## Objective
+This Flask application fetches and displays International Space Station (ISS) data, including comments, header information, metadata, state vectors, and more.
 
-This project provides a Flask application for tracking the International Space Station (ISS) using NASA's ISS data API. The app exposes several routes to retrieve information about ISS state vectors, including the entire data set, state vectors for a specific epoch, instantaneous speed for a specific epoch, and state vectors with instantaneous speed for the epoch nearest in time.
+## Features
 
-## How to Access the Data
+- Fetch and display ISS comments
+- Retrieve ISS header information
+- Extract ISS metadata
+- Get the entire data set of ISS state vectors
+- Retrieve state vectors for a specific epoch
+- Calculate instantaneous speed for a specific epoch
+- Fetch location data for a specific epoch
+- Get data for the epoch nearest to the current time
 
-The ISS data is fetched from the NASA API. You can access the data by making a GET request to the following URL:
-[ISS Data API](https://nasa-public-data.s3.amazonaws.com/iss-coords/current/ISS_OEM/ISS.OEM_J2K_EPH.xml)
+## Setup
 
-## Building the Container
+### Requirements
 
-To build the Docker container for the Flask app, navigate to the project directory and run the following command:
+- Python 3.x
+- Docker
+- Docker Compose
+
+### Installation
+
+1. Clone the repository:
 
 ```bash
-docker build -t iss-tracker .
+   git clone <repository-url>
+   cd iss-tracker-flask
 ```
-## Deploying a Contanierzied Flask App
 
-After building the container, you can run the Flask app using the following command
+#### Install dependencies:
+    ```bash
+    pip install -r requirements.txt
+```
 
+## Running the Application
+### Local Development
+1. Run the Flask application locally:
 ```bash
-flask --app iss_tracker --debug run
+   python iss_tracker.py
 ```
-The app will be accessible at http://127.0.0.1:5000/.
+2. Access the application at http://127.0.0.1:5000.
 
-## Accessing Routes
-### /epochs
-Returns the entire data set or a modified list based on query parameters
-Example:
+### Using Docker
+1. Build the Docker image:
 ```bash
-curl http://127.0.0.1:5000/epochs?limit=10&offset=0
+   docker build -t iss-tracker-flask .
 ```
-### /epochs/<epoch>
-Returns the state vectors for a sepcific epoc from the data set
-Example:
+2. Run the Docker container:
 ```bash
-curl http://127.0.0.1:5000/epochs/2024-05-02T12:16:00.000Z
+   docker run -p 5000:5000 iss-tracker-flask
 ```
-### /epochs/'<'epoch'>'/speed
-Returns instantaneous speed for a specific epoch
-Example:
+3. Access the application at http://127.0.0.1:5000.
+## Testing
+To run the tests, execute the following command:
 ```bash
-curl http://127.0.0.1:5000/epochs/2024-05-02T12:16:00.000Z/speed
+    pytest
 ```
-### /now
-Returns the state vectors and instantaneous speed for the epoch nearest in time.
-Example:
-```bash
-curl http://127.0.0.1:5000/now
-```
+## API Endpoints
+/comment: Fetches and returns the comments from ISS data.
+/header: Fetches and returns the header information from ISS data.
+/metadata: Fetches and returns the metadata from ISS data.
+/epochs: Fetches and returns the entire data set of ISS state vectors.
+/epochs/<epoch>: Fetches and returns the state vectors for a specific epoch.
+/epocs?limit=int&offset=int: Fetches and returns modified list of Epochs given query parameters
+/epochs/<epoch>/speed: Fetches and returns the instantaneous speed for a specific epoch.
+/epochs/<epoch>/location: Fetches and returns the location data for a specific epoch.
+/now: Fetches and returns data for the epoch nearest to the current time.
+
+## Credits
+This application was developed by Dana Kim.
