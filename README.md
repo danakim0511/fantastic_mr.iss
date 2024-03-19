@@ -107,5 +107,10 @@ speed: The instantaneous speed of the ISS in kilometers per second.
 
 These outputs provide valuable information about the ISS state vectors at different epochs, allowing users to analyze and understand the movement and position of the International Space Station over time.
 
+## Running Containerized Unit Tests
+To run the unit tests inside the Docker container, use the following command:
+```bash
+docker-compose run iss-tracker pytest
+```
 ## Credits
 This application was developed by Dana Kim.
